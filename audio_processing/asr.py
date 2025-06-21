@@ -32,9 +32,10 @@ try:
         audio_data = stream.read(CHUNK, exception_on_overflow=False)
         audio_np = np.frombuffer(audio_data, np.int16).astype(np.float32) / 32768.0
         energy = np.sqrt(np.mean(audio_np**2))  # RMS energy
-        print(f"Energy is {energy} vs. threshold {SILENCE_THRESHOLD} = {energy > SILENCE_THRESHOLD}")
+        # print(f"Energy is {energy} vs. threshold {SILENCE_THRESHOLD} = {energy > SILENCE_THRESHOLD}")
 
         if energy > SILENCE_THRESHOLD:
+            print("Recording in progress ...")
             recording = True
             audio_buffer.extend(audio_np.tolist())
             silence_counter = 0
