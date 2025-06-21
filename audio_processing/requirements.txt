@@ -1,5 +1,7 @@
 torch
 numpy
 openai-whisper
+openai
+python-dotenv
 pyaudio
 
