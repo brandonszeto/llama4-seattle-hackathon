@@ -1,4 +1,4 @@
-export const DEEPGRAM_API_KEY = "e038ecc755b662c1a80cdd5f18cbaf1f99063829";
+import { DEEPGRAM_API_KEY } from "../env.js";
 /**
  * Transcribes audio using Deepgram API
  * @param {File} audioFile - An audio File object from <input type="file">
