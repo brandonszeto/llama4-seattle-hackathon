@@ -1,5 +1,5 @@
 import { speak } from "./audio_processing/tts.js";
-import { transcribeFromMicContinuous } from './audio_processing/asr.js';
+import { transcribeFromMicContinuous, transcribeOnceFromMic } from './audio_processing/asr.js';
 const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
 const sendButton = document.getElementById("send-button");
@@ -128,6 +128,14 @@ function displayMessage(text, role, interactive = false) {
   return messageDiv;
 }
 
+const affirmativePhrases = [
+  "yes", "confirm", "okay", "sure", "do it", "go ahead", "please", "yup", "yeah"
+];
+
+const negativePhrases = [
+  "no", "cancel", "stop", "don't", "never mind", "nah", "abort"
+];
+
 function displayConfirmationMessage(message, onConfirm, onCancel) {
   const confirmText = `
     <div style="margin-bottom: 12px;">${message}</div>
@@ -152,24 +160,65 @@ function displayConfirmationMessage(message, onConfirm, onCancel) {
     </div>
   `;
 
-  const messageDiv = displayMessage(confirmText, 'system', true);
+  const messageDiv = displayMessage(confirmText, "system", true);
+  const cancelBtn = messageDiv.querySelector(".confirm-cancel-btn");
+  const confirmBtn = messageDiv.querySelector(".confirm-confirm-btn");
 
-  // Add event listeners
-  const cancelBtn = messageDiv.querySelector('.confirm-cancel-btn');
-  const confirmBtn = messageDiv.querySelector('.confirm-confirm-btn');
+  let cancelled = false;
 
-  cancelBtn.addEventListener('click', () => {
+  const stopListening = () => {
+    cancelled = true;
+    // Future-proof: manually stop ASR stream here if needed
+    console.log("🛑 Stopping voice listener");
+  };
+
+  const handleVoiceConfirm = async () => {
+    try {
+      while (!cancelled) {
+        const transcript = await transcribeOnceFromMic(); // assumed to resolve with string
+        const normalized = transcript.trim().toLowerCase();
+
+        if (affirmativePhrases.some(p => normalized.includes(p))) {
+          console.log("✅ Heard confirmation:", normalized);
+          messageDiv.remove();
+          stopListening();
+          return onConfirm();
+        }
+
+        if (negativePhrases.some(p => normalized.includes(p))) {
+          console.log("❌ Heard cancellation:", normalized);
+          messageDiv.remove();
+          stopListening();
+          return onCancel();
+        }
+
+        // Continue listening if uncertain
+        displayMessage(`Heard: "${normalized}". Please say "yes" or "cancel".`, "system");
+      }
+    } catch (err) {
+      console.error("🎙️ Voice input failed:", err);
+    }
+  };
+
+  // Start audio transcription loop
+  handleVoiceConfirm();
+
+  // Manual UI button handlers
+  cancelBtn.addEventListener("click", () => {
     messageDiv.remove();
+    stopListening();
     onCancel();
   });
 
-  confirmBtn.addEventListener('click', () => {
+  confirmBtn.addEventListener("click", () => {
     messageDiv.remove();
+    stopListening();
     onConfirm();
   });
 
   return messageDiv;
 }
+
 
 function renderConversation() {
   conversationView.innerHTML = "";

@@ -97,11 +97,6 @@ export async function transcribeFromMic(recordTimeMs = 5000) {
 
     // Start recording
     mediaRecorder.start();
-
-    // Stop recording after specified duration
-    setTimeout(() => {
-      mediaRecorder.stop();
-    }, recordTimeMs);
   });
 }
 
@@ -154,7 +149,8 @@ export async function transcribeFromMicContinuous(onTranscript) {
         const transcript = json.results.channels[0].alternatives[0].transcript;
         console.log("🗣️", transcript);
 
-        if (transcript.trim()) {
+        if (transcript.trim() && transcript.split(" ").length > 3) {
+          console.log("transcript word length: ", transcript.split(" ").length)
           onTranscript(transcript);
         }
 
@@ -193,4 +189,93 @@ export async function transcribeFromMicContinuous(onTranscript) {
 
   input.connect(processor);
   processor.connect(audioContext.destination);
+}
+
+export async function transcribeOnceFromMic() {
+  const SILENCE_THRESHOLD = 0.03;
+  const SILENCE_MS = 1800;
+  const CHUNK_MS = 1024 / 16000 * 1000; // ~64ms at 16kHz
+
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const audioContext = new AudioContext();
+  const input = audioContext.createMediaStreamSource(stream);
+  const processor = audioContext.createScriptProcessor(1024, 1, 1);
+
+  let mediaRecorder = null;
+  let currentChunks = [];
+  let recording = false;
+  let silenceMs = 0;
+
+  const deepgramRequest = async (arrayBuffer) => {
+    const res = await fetch(
+      "https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${DEEPGRAM_API_KEY}`,
+          "Content-Type": "audio/webm",
+        },
+        body: arrayBuffer,
+      }
+    );
+
+    const json = await res.json();
+    const transcript = json.results.channels[0].alternatives[0].transcript || "";
+    return transcript.trim();
+  };
+
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      try {
+        processor.disconnect();
+        input.disconnect();
+        stream.getTracks().forEach(t => t.stop());
+      } catch (err) {
+        console.warn("Cleanup error:", err);
+      }
+    };
+
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+
+    mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) currentChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      try {
+        const blob = new Blob(currentChunks, { type: "audio/webm" });
+        const arrayBuffer = await blob.arrayBuffer();
+        const transcript = await deepgramRequest(arrayBuffer);
+        console.log("🗣️", transcript);
+        cleanup();
+        resolve(transcript);
+      } catch (err) {
+        cleanup();
+        reject(err);
+      }
+    };
+
+    processor.onaudioprocess = e => {
+      const inputData = e.inputBuffer.getChannelData(0);
+      const rms = Math.sqrt(inputData.reduce((sum, s) => sum + s * s, 0) / inputData.length);
+
+      if (rms > SILENCE_THRESHOLD) {
+        if (!recording) {
+          console.log("🎤 Recording started...");
+          mediaRecorder.start();
+          recording = true;
+        }
+        silenceMs = 0;
+      } else if (recording) {
+        silenceMs += CHUNK_MS;
+        if (silenceMs > SILENCE_MS) {
+          console.log("🛑 Silence detected, stopping...");
+          mediaRecorder.stop();
+        }
+      }
+    };
+
+    input.connect(processor);
+    processor.connect(audioContext.destination);
+  });
 }
