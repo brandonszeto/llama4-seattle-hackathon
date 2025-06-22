@@ -20,7 +20,7 @@ async function callLlamaAPI(text, base64Image) {
   const apiKey = "LLM|1878124186367381|PZsjlEaCaJBnU-mW9Uwt4J8jIdg";
 
   if (apiKey === "YOUR_LLAMA_API_KEY") {
-    displayMessage("API key not set. Please edit sidebar.js", "error");
+    // displayMessage("API key not set. Please edit sidebar.js", "error");
     throw new Error("API Key not set");
   }
 
@@ -32,7 +32,7 @@ async function callLlamaAPI(text, base64Image) {
   // Add file context if available
   if (uploadedFile) {
     try {
-      displayMessage(`Extracting content from file: ${uploadedFile.name}...`, "system");
+      // displayMessage(`Extracting content from file: ${uploadedFile.name}...`, "system");
       
       // Extract text content from the file
       const fileContent = await readFileContent(uploadedFile);      // Add file content to the system prompt to ensure it's used as context
@@ -42,7 +42,7 @@ async function callLlamaAPI(text, base64Image) {
       // Check if the extracted content appears to be meaningful text
       if (!isMeaningfulText(processedContent)) {
         console.warn("⚠️ Extracted file content appears to be binary data or encoded text");
-        displayMessage(`Warning: The extracted content from "${uploadedFile.name}" doesn't appear to be readable text. Try a different PDF or check if the file is password-protected.`, "error");
+        // displayMessage(`Warning: The extracted content from "${uploadedFile.name}" doesn't appear to be readable text. Try a different PDF or check if the file is password-protected.`, "error");
         processedContent = `[The content of "${uploadedFile.name}" could not be extracted properly. The file may be encrypted, password-protected, or use an unsupported encoding.]`;
       }
       // If extracted content contains PDF structure metadata markers, it may indicate poor extraction
@@ -87,7 +87,7 @@ Use this content to answer the user's questions when relevant.
                           fileContent.substring(0, 100) + '...' : 
                           fileContent;
       
-      displayMessage(`Using context from file: ${uploadedFile.name}`, "system");      // Display the extracted content in console for debugging
+      // displayMessage(`Using context from file: ${uploadedFile.name}`, "system");      // Display the extracted content in console for debugging
       console.group("📄 Extracted Document Content");
       console.log("File name:", uploadedFile.name);
       console.log("File type:", uploadedFile.type);
@@ -100,7 +100,7 @@ Use this content to answer the user's questions when relevant.
       console.groupEnd();
       
       // Add an easy way for users to see the extracted content
-      displayMessage(`Content extracted from file. Check browser console (F12 > Console tab) to view the full extracted text.`, "system");
+      // displayMessage(`Content extracted from file. Check browser console (F12 > Console tab) to view the full extracted text.`, "system");
       
       // If we have enough content, add it to the API payload
       if (processedContent.length > 20) {
@@ -110,11 +110,11 @@ Use this content to answer the user's questions when relevant.
           content: contextMessage
         });
       } else {
-        displayMessage("Warning: Very little content could be extracted from the file", "error");
+        // displayMessage("Warning: Very little content could be extracted from the file", "error");
       }
     } catch (error) {
       console.error("Error reading file content:", error);
-      displayMessage("Error processing file. Please try again.", "error");
+      // displayMessage("Error processing file. Please try again.", "error");
     }
   }
 
@@ -155,7 +155,7 @@ Use this content to answer the user's questions when relevant.
     return responseData.completion_message.content.text;
   } catch (error) {
     console.error("Failed to call Llama API:", error);
-    displayMessage(`Error: ${error.message}`, "error");
+    // displayMessage(`Error: ${error.message}`, "error");
     throw error;
   }
 }
@@ -244,10 +244,10 @@ async function loadFileContext() {
         fileNameDisplay.textContent = "";
         fileUploadInput.value = "";
         chrome.storage.local.remove(["contextFileName", "contextFileType", "contextFileData", "extractedText"]);
-        displayMessage("Context file removed", "system");
+        // displayMessage("Context file removed", "system");
       });
       
-      displayMessage(`Loaded context from file: ${data.contextFileName}`, "system");
+      // displayMessage(`Loaded context from file: ${data.contextFileName}`, "system");
     }
   } catch (error) {
     console.error("Error loading file context:", error);
@@ -322,9 +322,9 @@ async function handleFileUpload(event) {
     fileNameDisplay.textContent = "";
     fileUploadInput.value = "";
     chrome.storage.local.remove(["contextFileName", "contextFileType", "contextFileData", "extractedText"]);
-    displayMessage("Context file removed", "system");
+    // displayMessage("Context file removed", "system");
   });    // Display that the file was uploaded
-  displayMessage(`Added context file: ${file.name}`, "system");
+  // displayMessage(`Added context file: ${file.name}`, "system");
   
   // Add processing indicator
   fileNameDisplay.innerHTML = `${file.name} <span class="processing-indicator">(Processing...)</span> <span class="remove-file">&times;</span>`;
@@ -340,17 +340,17 @@ async function handleFileUpload(event) {
     fileNameDisplay.textContent = "";
     fileUploadInput.value = "";
     chrome.storage.local.remove(["contextFileName", "contextFileType", "contextFileData", "extractedText"]);
-    displayMessage("Context file removed", "system");
+    // displayMessage("Context file removed", "system");
   });
   
   try {
     // Extract text content for direct use
-    displayMessage(`Extracting text from file...`, "system");
+    // displayMessage(`Extracting text from file...`, "system");
     const extractedText = await readFileContent(file);
     
     // Store both the file data (for recreation) and extracted text (for use)
     const fileData = await readAsBase64(file);
-      displayMessage(`File processed successfully!`, "system");
+      // displayMessage(`File processed successfully!`, "system");
     
     // Remove processing indicator
     fileNameDisplay.innerHTML = `${file.name} <span class="remove-file">&times;</span>`;
@@ -366,7 +366,7 @@ async function handleFileUpload(event) {
       fileNameDisplay.textContent = "";
       fileUploadInput.value = "";
       chrome.storage.local.remove(["contextFileName", "contextFileType", "contextFileData", "extractedText"]);
-      displayMessage("Context file removed", "system");
+      // displayMessage("Context file removed", "system");
     });
     
     // Store file info in chrome.storage
@@ -377,7 +377,7 @@ async function handleFileUpload(event) {
       extractedText: extractedText
     });  } catch (error) {
     console.error("Error processing file:", error);
-    displayMessage(`Error processing file: ${error.message}`, "error");
+    // displayMessage(`Error processing file: ${error.message}`, "error");
     
     // Remove processing indicator even if error occurred
     fileNameDisplay.innerHTML = `${file.name} <span class="remove-file">&times;</span>`;
@@ -389,7 +389,7 @@ async function handleFileUpload(event) {
       fileNameDisplay.textContent = "";
       fileUploadInput.value = "";
       chrome.storage.local.remove(["contextFileName", "contextFileType", "contextFileData", "extractedText"]);
-      displayMessage("Context file removed", "system");
+      // displayMessage("Context file removed", "system");
     });
   }
 }
@@ -412,7 +412,7 @@ async function readFileContent(file) {
       const serverUrl = "http://localhost:5000/process-document";
       
       try {
-        displayMessage(`Sending file to server for processing...`, "system");
+        // displayMessage(`Sending file to server for processing...`, "system");
         console.log("🌐 Attempting server-side extraction...");
         
         // Convert file to base64
@@ -445,7 +445,7 @@ async function readFileContent(file) {
         }
       } catch (serverError) {
         console.error("❌ Server-side extraction failed:", serverError);
-        displayMessage(`Server processing failed, falling back to browser extraction...`, "system");
+        // displayMessage(`Server processing failed, falling back to browser extraction...`, "system");
         
         // If server fails, fall back to client-side processing
         if (file.type === 'application/pdf') {

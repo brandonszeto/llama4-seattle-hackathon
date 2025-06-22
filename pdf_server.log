@@ -8,3 +8,27 @@
 2025-06-21 21:01:42,292 - __main__ - INFO - Starting PDF processing server on port 5000
 2025-06-21 21:01:42,357 - werkzeug - WARNING -  * Debugger is active!
 2025-06-21 21:01:42,367 - werkzeug - INFO -  * Debugger PIN: 774-477-617
+2025-06-21 21:13:54,330 - __main__ - INFO - Processing document: Receipt Notice.pdf (application/pdf)
+2025-06-21 21:13:54,485 - __main__ - INFO - Successfully processed document: Receipt Notice.pdf - Content length: 7910
+2025-06-21 21:13:54,501 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:13:54] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:14:14,644 - __main__ - INFO - Processing document: Kavitha employment letter.pdf (application/pdf)
+2025-06-21 21:14:14,715 - __main__ - INFO - Successfully processed document: Kavitha employment letter.pdf - Content length: 738
+2025-06-21 21:14:14,715 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:14:14] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:14:30,461 - __main__ - INFO - Processing document: KavithaPadala_Resume (2).pdf (application/pdf)
+2025-06-21 21:14:31,011 - __main__ - INFO - Successfully processed document: KavithaPadala_Resume (2).pdf - Content length: 11555
+2025-06-21 21:14:31,012 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:14:31] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:15:13,747 - __main__ - INFO - Processing document: KavithaPadala_StandardFormat.docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+2025-06-21 21:15:13,773 - __main__ - INFO - Successfully processed document: KavithaPadala_StandardFormat.docx - Content length: 7514
+2025-06-21 21:15:13,773 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:15:13] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:15:26,460 - __main__ - INFO - Processing document: employer update.pdf (application/pdf)
+2025-06-21 21:15:26,573 - __main__ - INFO - Successfully processed document: employer update.pdf - Content length: 13041
+2025-06-21 21:15:26,575 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:15:26] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:15:51,960 - __main__ - INFO - Processing document: employer update.pdf (application/pdf)
+2025-06-21 21:15:51,994 - __main__ - INFO - Successfully processed document: employer update.pdf - Content length: 13041
+2025-06-21 21:15:51,994 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:15:51] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:22:24,775 - __main__ - INFO - Processing document: Kavitha employment letter.pdf (application/pdf)
+2025-06-21 21:22:24,824 - __main__ - INFO - Successfully processed document: Kavitha employment letter.pdf - Content length: 738
+2025-06-21 21:22:24,825 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:22:24] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:23:02,202 - __main__ - INFO - Processing document: Kavitha employment letter.pdf (application/pdf)
+2025-06-21 21:23:02,229 - __main__ - INFO - Successfully processed document: Kavitha employment letter.pdf - Content length: 738
+2025-06-21 21:23:02,229 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:23:02] "POST /process-document HTTP/1.1" 200 -
