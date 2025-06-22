@@ -111,7 +111,7 @@ async function handleSendClick() {
     console.error("An error occurred in handleSendClick:", error);
   } finally {
     sendButton.disabled = false;
-    sendButton.textContent = "Capture & Ask Llama";
+    sendButton.textContent = "Capture & Ask Meta";
     userPromptInput.focus();
   }
 }
