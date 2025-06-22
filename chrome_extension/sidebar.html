@@ -9,12 +9,19 @@
         <div id="main-container">
             <div id="conversation-view"></div>
             <div id="input-area">
+                <div class="mode-toggle">
+                    <button id="mode-toggle-btn" class="speech-mode">Speech Mode</button>
+                </div>
+                
                 <textarea
                     id="user-prompt"
                     placeholder="Ask about the screen..."
                 ></textarea>
 
-                <button id="toggle-audio-button">Start Mic</button>
+                <div class="audio-controls">
+                    <button id="toggle-audio-button">Start Mic</button>
+                    <button id="stop-speaking-button">Stop Speaking</button>
+                </div>
 
                 <div class="button-container">
                     <button id="send-button">Capture & Ask Meta</button>

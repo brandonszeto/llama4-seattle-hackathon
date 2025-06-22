@@ -1,4 +1,4 @@
-import { speak } from "./audio_processing/tts.js";
+import { speak, stopSpeaking, isSpeaking } from "./audio_processing/tts.js";
 import { transcribeFromMicContinuous, transcribeOnceFromMic, stopAllASR, startASR, getIsFirstSpeech, initSpeech } from './audio_processing/asr.js';
 const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
@@ -32,16 +32,27 @@ Available action commands you can use:
 Your tone should be helpful, patient, and encouraging. Always prioritize user safety by confirming actions.`;
 
 let isListening = false;
+let currentMode = 'speech'; // 'speech' or 'chat'
 const toggleAudioBtn = document.getElementById("toggle-audio-button");
+const modeToggleBtn = document.getElementById("mode-toggle-btn");
 
 toggleAudioBtn.addEventListener("click", async () => {
+  // Only allow mic functionality in speech mode
+  if (currentMode !== 'speech') {
+    return;
+  }
+
   if (isListening) {
     stopAllASR();
+    stopSpeaking(); // Stop any ongoing speech when mic is turned off
     toggleAudioBtn.textContent = "Start Mic";
     isListening = false;
     return;
   }
 
+  // Stop any ongoing speech when starting to listen
+  stopSpeaking();
+  
   startASR();
   toggleAudioBtn.textContent = "Stop Mic";
   isListening = true;
@@ -51,7 +62,6 @@ toggleAudioBtn.addEventListener("click", async () => {
       initSpeech();
       await speak("Hi there, I'm Llama your helpful assistant. You're in accessibility mode—let me know what I can help with!");
     }
-
 
     await transcribeFromMicContinuous((transcript) => {
       if (!isListening) return; // prevent any late response
@@ -232,8 +242,10 @@ function displayConfirmationMessage(message, onConfirm, onCancel) {
     }
   };
 
-  // Start audio transcription loop
-  handleVoiceConfirm();
+  // Start audio transcription loop only in speech mode
+  if (currentMode === 'speech') {
+    handleVoiceConfirm();
+  }
 
   // Manual UI button handlers
   cancelBtn.addEventListener("click", () => {
@@ -295,7 +307,11 @@ async function handleSendClick() {
       .replace(/^\s+|\s+$/g, '') // Trim whitespace
       .trim();
 displayMessage(messageDisplay, "assistant");
-await speak(messageDisplay);
+
+// Only speak in speech mode
+if (currentMode === 'speech') {
+  await speak(messageDisplay);
+}
     // displayMessage(assistantResponse, "assistant");
     // await speak(assistantResponse);
 
@@ -529,9 +545,48 @@ async function toggleHighlights() {
   }
 }
 
+function toggleMode() {
+  currentMode = currentMode === 'speech' ? 'chat' : 'speech';
+  updateModeUI();
+}
+
+function updateModeUI() {
+  const audioControls = document.querySelector('.audio-controls');
+  
+  if (currentMode === 'speech') {
+    modeToggleBtn.textContent = 'Speech Mode';
+    modeToggleBtn.className = 'speech-mode';
+    audioControls.style.display = 'flex';
+    userPromptInput.placeholder = 'Use mic or type here...';
+  } else {
+    modeToggleBtn.textContent = 'Chat Mode';
+    modeToggleBtn.className = 'chat-mode';
+    audioControls.style.display = 'none';
+    userPromptInput.placeholder = 'Type your message...';
+    
+    // Stop any ongoing speech/listening when switching to chat mode
+    if (isListening) {
+      stopAllASR();
+      toggleAudioBtn.textContent = "Start Mic";
+      isListening = false;
+    }
+    stopSpeaking();
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   loadConversation();
+  updateModeUI(); // Initialize UI based on default mode
 
+  // Add event listener for mode toggle button
+  modeToggleBtn.addEventListener('click', toggleMode);
+  
   // Add event listener for toggle highlights button
   document.getElementById('toggle-highlights-btn').addEventListener('click', toggleHighlights);
+  
+  // Add event listener for stop speaking button
+  document.getElementById('stop-speaking-button').addEventListener('click', () => {
+    stopSpeaking();
+    console.log("Speech stopped by user");
+  });
 });
