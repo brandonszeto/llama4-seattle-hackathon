@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Llama Sidebar Helper</title>
+        <title>Meta Sidebar Helper</title>
         <link rel="stylesheet" href="sidebar.css" />
     </head>
     <body>
@@ -13,9 +13,13 @@
                     id="user-prompt"
                     placeholder="Ask about the screen..."
                 ></textarea>
-                <button id="send-button">Capture & Ask Llama</button>
                 
                 <button id="toggle-audio-button">Start Mic</button>
+
+                <div class="button-container">
+                    <button id="send-button">Capture & Ask Meta</button>
+                    <button id="reset-button">Reset</button>
+                </div>
             </div>
         </div>
         <script type="module" src="sidebar.js"></script>

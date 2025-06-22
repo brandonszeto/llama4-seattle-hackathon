@@ -1,5 +1,7 @@
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, sans-serif;
     width: 420px;
     height: 97vh;
     margin: 0;
@@ -52,10 +54,28 @@ body {
     text-align: center;
 }
 
+.system-message {
+    background-color: #34c759;
+    color: white;
+    align-self: center;
+    text-align: center;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 12px;
+}
+
 #input-area {
     padding: 10px;
     border-top: 1px solid #dcdcdc;
     background-color: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
 }
 
 #user-prompt {
@@ -71,7 +91,7 @@ body {
 }
 
 #send-button {
-    width: 100%;
+    width: 80%;
     padding: 12px;
     border-radius: 8px;
     border: none;
@@ -83,10 +103,25 @@ body {
     transition: background-color 0.2s;
 }
 
-#send-button:hover {
+#reset-button {
+    width: 20%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #007aff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#send-button:hover,
+#reset-button:hover {
     background-color: #0056b3;
 }
 
+#send-button:disabled,
 #send-button:disabled {
     background-color: #a0a0a0;
     cursor: not-allowed;
