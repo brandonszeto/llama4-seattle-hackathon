@@ -231,9 +231,6 @@ function displayConfirmationMessage(message, onConfirm, onCancel) {
           stopListening();
           return onCancel();
         }
-
-        // Continue listening if uncertain
-        displayMessage(`Heard: "${normalized}". Please say "yes" or "cancel".`, "system");
       }
     } catch (err) {
       console.error("🎙️ Voice input failed:", err);
