@@ -1,6 +1,7 @@
 const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
 const sendButton = document.getElementById("send-button");
+const resetButton = document.getElementById("reset-button");
 
 let conversationHistory = [];
 const SYSTEM_PROMPT = `You are an expert AI assistant designed to guide users through graphical user interfaces (GUIs).
@@ -128,7 +129,15 @@ async function loadConversation() {
   }
 }
 
+async function handleResetClick() {
+  conversationHistory = [];
+  conversationView.innerHTML = "";
+  userPromptInput.value = "";
+  await chrome.storage.local.remove("conversationHistory");
+}
+
 sendButton.addEventListener("click", handleSendClick);
+resetButton.addEventListener("click", handleResetClick);
 userPromptInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
