@@ -91,7 +91,7 @@ body {
 }
 
 #send-button {
-    width: 80%;
+    width: 60%;
     padding: 12px;
     border-radius: 8px;
     border: none;
@@ -103,7 +103,8 @@ body {
     transition: background-color 0.2s;
 }
 
-#reset-button {
+#reset-button,
+#toggle-highlights-btn {
     width: 20%;
     padding: 12px;
     border-radius: 8px;
@@ -117,7 +118,8 @@ body {
 }
 
 #send-button:hover,
-#reset-button:hover {
+#reset-button:hover,
+#toggle-highlights-btn:hover {
     background-color: #0056b3;
 }
 
