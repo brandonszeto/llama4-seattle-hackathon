@@ -1,4 +1,5 @@
-import { OPENAI_KEY } from "../env.js";/**
+export const OPENAI_KEY="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"
+/**
  * Generate speech from text using OpenAI's TTS API and play it back.
  * @param {string} text - The input text to be converted to speech.
  * @param {string} voice - One of: "nova", "shimmer", "echo", "onyx", "fable"
