@@ -73,3 +73,17 @@
 2025-06-21 21:46:54,574 - __main__ - INFO - Processing document: Questions and SQL queries for AI POC.docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
 2025-06-21 21:46:54,677 - __main__ - INFO - Successfully processed document: Questions and SQL queries for AI POC.docx - Content length: 5972
 2025-06-21 21:46:54,678 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:46:54] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 22:06:27,896 - __main__ - INFO - Processing document: KavithaPadala_Resume (3).pdf (application/pdf)
+2025-06-21 22:06:28,317 - __main__ - INFO - Successfully processed document: KavithaPadala_Resume (3).pdf - Content length: 11555
+2025-06-21 22:06:28,317 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:06:28] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 22:08:07,162 - __main__ - INFO - Processing document: Hemanthsaikumar.pdf (application/pdf)
+2025-06-21 22:08:07,837 - __main__ - INFO - Successfully processed document: Hemanthsaikumar.pdf - Content length: 9956
+2025-06-21 22:08:07,837 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:08:07] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 22:20:37,952 - __main__ - INFO - Processing document: Why Become a Financial Professional.pdf (application/pdf)
+2025-06-21 22:20:38,238 - __main__ - INFO - Successfully processed document: Why Become a Financial Professional.pdf - Content length: 8971
+2025-06-21 22:20:38,251 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:20:38] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 22:23:10,588 - __main__ - INFO - Processing document: Lab 4 - Publishing and Accessing Reports.pdf (application/pdf)
+2025-06-21 22:23:11,354 - __main__ - INFO - Successfully processed document: Lab 4 - Publishing and Accessing Reports.pdf - Content length: 34418
+2025-06-21 22:23:11,354 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:23:11] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 22:24:55,380 - werkzeug - INFO -  * Detected change in 'C:\\Users\\KavithaPadala(Quadra\\Desktop\\Hackathon\\llama4-seattle-hackathon\\server.py', reloading
+2025-06-21 22:24:55,631 - werkzeug - INFO -  * Restarting with stat
