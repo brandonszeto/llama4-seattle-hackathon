@@ -2,14 +2,16 @@
   "manifest_version": 3,
   "name": "Llama Sidebar Helper",
   "version": "1.1.0",
-  "description": "Analyzes a screenshot of the current tab in a sidebar using the Llama API.",
+  "description": "Analyzes a screenshot and DOM of the current tab in a sidebar using the Llama API.",
   "permissions": [
     "activeTab",
     "storage",
-    "sidePanel"
+    "sidePanel",
+    "scripting"
   ],
   "host_permissions": [
-    "https://api.llama.com/*"
+    "https://api.llama.com/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
@@ -25,6 +27,13 @@
   "side_panel": {
     "default_path": "sidebar.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"],
+      "css": ["contentStyle.css"]
+    }
+  ],
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",
@@ -32,7 +41,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["sidebar.html", "sidebar.js", "sidebar.css"],
+      "resources": ["sidebar.html", "sidebar.js", "sidebar.css", "contentStyle.css"],
       "matches": ["<all_urls>"]
     }
   ],
