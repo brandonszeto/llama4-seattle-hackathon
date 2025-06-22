@@ -311,9 +311,8 @@ async function handleFileUpload(event) {
   if (!file) return;
   uploadedFile = file;
   fileNameDisplay.textContent = file.name;
-  
-  // Show file name and an X button to remove it
-  fileNameDisplay.innerHTML = `${file.name} <span class="remove-file">&times;</span>`;
+    // Show file name and an X button to remove it
+  fileNameDisplay.innerHTML = `<span id="file-name-text">${file.name}</span><span class="remove-file">&times;</span>`;
   
   // Add click handler to remove file
   document.querySelector('.remove-file').addEventListener('click', (e) => {
@@ -325,9 +324,8 @@ async function handleFileUpload(event) {
     // displayMessage("Context file removed", "system");
   });    // Display that the file was uploaded
   // displayMessage(`Added context file: ${file.name}`, "system");
-  
-  // Add processing indicator
-  fileNameDisplay.innerHTML = `${file.name} <span class="processing-indicator">(Processing...)</span> <span class="remove-file">&times;</span>`;
+    // Add processing indicator
+  fileNameDisplay.innerHTML = `<span id="file-name-text">${file.name}</span> <span class="processing-indicator">(Processing...)</span> <span class="remove-file">&times;</span>`;
   
   // Hide the preview button while processing
   showExtractedTextButton.style.display = "none";
@@ -351,9 +349,8 @@ async function handleFileUpload(event) {
     // Store both the file data (for recreation) and extracted text (for use)
     const fileData = await readAsBase64(file);
       // displayMessage(`File processed successfully!`, "system");
-    
-    // Remove processing indicator
-    fileNameDisplay.innerHTML = `${file.name} <span class="remove-file">&times;</span>`;
+      // Remove processing indicator
+    fileNameDisplay.innerHTML = `<span id="file-name-text">${file.name}</span><span class="remove-file">&times;</span>`;
     
     // Update the extracted text preview
     updateExtractedTextPreview(extractedText);
@@ -1129,16 +1126,7 @@ function toggleExtractedTextPreview() {
 function updateExtractedTextPreview(text) {
   // Check if the text appears to be meaningful
   if (text && !isMeaningfulText(text)) {
-    extractedTextPreview.innerHTML = `<div style="color: #c93030; font-style: italic; padding: 5px;">
-      The extracted text appears to be binary data or encoded content rather than readable text. 
-      This may happen with:
-      <ul>
-        <li>Password-protected or encrypted PDFs</li>
-        <li>Scanned documents (images) without OCR</li>
-        <li>PDFs with unusual encoding or structure</li>
-      </ul>
-      Try a different PDF file or one that contains selectable text.
-    </div>`;
+    extractedTextPreview.innerHTML = text;
   } else {
     extractedTextPreview.textContent = text;
   }
@@ -1170,12 +1158,7 @@ function isMeaningfulText(text) {
   
   // If text has many non-standard characters or looks like encoded/binary data
   if (printableRatio < 0.7 || !hasWords || !hasSpaces || hasExcessiveSymbols) {
-    console.warn("Extracted content appears to be non-meaningful text", { 
-      printableRatio, 
-      hasWords, 
-      hasSpaces, 
-      hasExcessiveSymbols 
-    });
+    
     return false;
   }
   

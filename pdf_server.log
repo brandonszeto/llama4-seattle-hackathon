@@ -32,3 +32,44 @@
 2025-06-21 21:23:02,202 - __main__ - INFO - Processing document: Kavitha employment letter.pdf (application/pdf)
 2025-06-21 21:23:02,229 - __main__ - INFO - Successfully processed document: Kavitha employment letter.pdf - Content length: 738
 2025-06-21 21:23:02,229 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:23:02] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:29:00,243 - __main__ - INFO - Processing document: Receipt Notice.pdf (application/pdf)
+2025-06-21 21:29:00,359 - __main__ - INFO - Successfully processed document: Receipt Notice.pdf - Content length: 7910
+2025-06-21 21:29:00,359 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:29:00] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:29:17,532 - __main__ - INFO - Processing document: Receipt Notice.pdf (application/pdf)
+2025-06-21 21:29:17,604 - __main__ - INFO - Successfully processed document: Receipt Notice.pdf - Content length: 7910
+2025-06-21 21:29:17,605 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:29:17] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:37:39,107 - __main__ - INFO - Processing document: KavithaPadala_StandardFormat.docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+2025-06-21 21:37:39,142 - __main__ - INFO - Successfully processed document: KavithaPadala_StandardFormat.docx - Content length: 7514
+2025-06-21 21:37:39,143 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:37:39] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:38:47,232 - werkzeug - INFO -  * Detected change in 'C:\\Users\\KavithaPadala(Quadra\\Desktop\\Hackathon\\llama4-seattle-hackathon\\server.py', reloading
+2025-06-21 21:38:47,435 - werkzeug - INFO -  * Restarting with stat
+2025-06-21 21:38:49,713 - __main__ - INFO - Starting PDF processing server on port 5000
+2025-06-21 21:38:49,733 - werkzeug - WARNING -  * Debugger is active!
+2025-06-21 21:38:49,749 - werkzeug - INFO -  * Debugger PIN: 774-477-617
+2025-06-21 21:39:18,441 - __main__ - INFO - Processing document: Receipt Notice.pdf (application/pdf)
+2025-06-21 21:39:18,521 - __main__ - INFO - Successfully processed document: Receipt Notice.pdf - Content length: 7910
+2025-06-21 21:39:18,521 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:39:18] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:40:45,779 - __main__ - INFO - Processing document: Hemanthsaikumar.pdf (application/pdf)
+2025-06-21 21:40:46,146 - __main__ - INFO - Successfully processed document: Hemanthsaikumar.pdf - Content length: 9956
+2025-06-21 21:40:46,146 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:40:46] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:42:10,691 - __main__ - INFO - Processing document: I-765.pdf (application/pdf)
+2025-06-21 21:42:10,806 - __main__ - INFO - Successfully processed document: I-765.pdf - Content length: 14899
+2025-06-21 21:42:10,806 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:10] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:42:31,697 - __main__ - INFO - Processing document: GasOps VPN & Certificate Installations (1).pdf (application/pdf)
+2025-06-21 21:42:31,793 - __main__ - INFO - Successfully processed document: GasOps VPN & Certificate Installations (1).pdf - Content length: 1993
+2025-06-21 21:42:31,793 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:31] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:43:45,884 - __main__ - INFO - Processing document: Lab 5.pdf (application/pdf)
+2025-06-21 21:43:46,872 - __main__ - INFO - Successfully processed document: Lab 5.pdf - Content length: 39282
+2025-06-21 21:43:46,872 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:43:46] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:44:34,591 - __main__ - INFO - Processing document: Instructor Guide .pdf (application/pdf)
+2025-06-21 21:44:35,158 - __main__ - INFO - Successfully processed document: Instructor Guide .pdf - Content length: 23537
+2025-06-21 21:44:35,158 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:35] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:45:34,125 - __main__ - INFO - Processing document: KavithaPadala_Resume.pdf (application/pdf)
+2025-06-21 21:45:34,493 - __main__ - INFO - Successfully processed document: KavithaPadala_Resume.pdf - Content length: 9685
+2025-06-21 21:45:34,493 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:45:34] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:46:26,243 - __main__ - INFO - Processing document: KavithaPadala_Resume (3).pdf (application/pdf)
+2025-06-21 21:46:26,680 - __main__ - INFO - Successfully processed document: KavithaPadala_Resume (3).pdf - Content length: 11555
+2025-06-21 21:46:26,686 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:46:26] "POST /process-document HTTP/1.1" 200 -
+2025-06-21 21:46:54,574 - __main__ - INFO - Processing document: Questions and SQL queries for AI POC.docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+2025-06-21 21:46:54,677 - __main__ - INFO - Successfully processed document: Questions and SQL queries for AI POC.docx - Content length: 5972
+2025-06-21 21:46:54,678 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:46:54] "POST /process-document HTTP/1.1" 200 -
