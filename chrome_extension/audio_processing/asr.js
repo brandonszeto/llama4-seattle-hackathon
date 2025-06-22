@@ -4,6 +4,12 @@ let isASREnabled = true;
 
 let isFirstSpeech = true;
 
+let isASRActive = false;
+
+export function isASRRunning() {
+  return isASRActive;
+}
+
 export function initSpeech() {
   isFirstSpeech = false;
 }
@@ -14,6 +20,7 @@ export function getIsFirstSpeech() {
 
 export function stopAllASR() {
   isASREnabled = false;
+  isASRActive = false;
   console.log("🛑 ASR manually stopped.");
 }
 
@@ -63,6 +70,13 @@ export async function transcribeAudio(audioFile) {
  * @returns {Promise<string>} Transcript string
  */
 export async function transcribeFromMic(recordTimeMs = 5000) {
+  // Obtain Lock
+  if (isASRActive) {
+    console.warn("⛔ ASR already running");
+    return Promise.reject("ASR already active");
+  }
+  isASRActive = true;
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     throw new Error("Browser does not support microphone access.");
   }
@@ -111,6 +125,8 @@ export async function transcribeFromMic(recordTimeMs = 5000) {
         resolve(transcript);
       } catch (err) {
         reject(err);
+      } finally {
+        isASRActive = false;
       }
     };
 
@@ -128,6 +144,13 @@ export async function transcribeFromMic(recordTimeMs = 5000) {
  * Calls `onTranscript(text)` for each utterance.
  */
 export async function transcribeFromMicContinuous(onTranscript) {
+  // Get lock on the mic
+  if (isASRActive) {
+    console.warn("⛔ ASR already running");
+    return;
+  }
+  isASRActive = true;
+
   const SILENCE_THRESHOLD = 0.03;
   const SILENCE_MS = 1800;
   const CHUNK_MS = 1024 / 16000 * 1000; // ~64ms at 16kHz
@@ -184,6 +207,8 @@ export async function transcribeFromMicContinuous(onTranscript) {
         restartMediaRecorder();
       } catch (err) {
         console.error("Transcription error:", err);
+      } finally {
+        isASRActive = false;
       }
     };
   };
@@ -251,6 +276,7 @@ export async function transcribeOnceFromMic() {
   return new Promise((resolve, reject) => {
     const cleanup = () => {
       try {
+        isASRActive = false;
         processor.disconnect();
         input.disconnect();
         stream.getTracks().forEach(t => t.stop());
