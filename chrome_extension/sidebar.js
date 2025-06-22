@@ -1,5 +1,5 @@
 import { speak } from "./audio_processing/tts.js";
-import { transcribeFromMicContinuous, transcribeOnceFromMic } from './audio_processing/asr.js';
+import { transcribeFromMicContinuous, transcribeOnceFromMic, stopAllASR, startASR, getIsFirstSpeech, initSpeech } from './audio_processing/asr.js';
 const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
 const sendButton = document.getElementById("send-button");
@@ -31,10 +31,30 @@ Available action commands you can use:
 
 Your tone should be helpful, patient, and encouraging. Always prioritize user safety by confirming actions.`;
 
-document.getElementById("toggle-audio-button").addEventListener("click", async () => {
+let isListening = false;
+const toggleAudioBtn = document.getElementById("toggle-audio-button");
+
+toggleAudioBtn.addEventListener("click", async () => {
+  if (isListening) {
+    stopAllASR();
+    toggleAudioBtn.textContent = "Start Mic";
+    isListening = false;
+    return;
+  }
+
+  startASR();
+  toggleAudioBtn.textContent = "Stop Mic";
+  isListening = true;
+
   try {
-    await speak("Hi there, I'm Llama your helpful, (anything!) assistant. You're in accessibility mode, so let me know if there's anything I can help you with!")
+    if (getIsFirstSpeech()) {
+      initSpeech();
+      await speak("Hi there, I'm Llama your helpful assistant. You're in accessibility mode—let me know what I can help with!");
+    }
+
+
     await transcribeFromMicContinuous((transcript) => {
+      if (!isListening) return; // prevent any late response
       userPromptInput.value = transcript;
       handleSendClick();
     });
@@ -42,6 +62,17 @@ document.getElementById("toggle-audio-button").addEventListener("click", async (
     console.error("Transcription failed:", err);
   }
 });
+// document.getElementById("toggle-audio-button").addEventListener("click", async () => {
+//   try {
+//     await speak("Hi there, I'm Llama your helpful, (anything!) assistant. You're in accessibility mode, so let me know if there's anything I can help you with!")
+//     await transcribeFromMicContinuous((transcript) => {
+//       userPromptInput.value = transcript;
+//       handleSendClick();
+//     });
+//   } catch (err) {
+//     console.error("Transcription failed:", err);
+//   }
+// });
 
 async function callLlamaAPI(text, base64Image, availableElements = []) {
   const apiKey = "LLM|1878124186367381|PZsjlEaCaJBnU-mW9Uwt4J8jIdg";

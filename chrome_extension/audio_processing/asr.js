@@ -1,4 +1,27 @@
 import { DEEPGRAM_API_KEY } from "../env.js";
+
+let isASREnabled = true;
+
+let isFirstSpeech = true;
+
+export function initSpeech() {
+  isFirstSpeech = false;
+}
+
+export function getIsFirstSpeech() {
+  return isFirstSpeech;
+}
+
+export function stopAllASR() {
+  isASREnabled = false;
+  console.log("🛑 ASR manually stopped.");
+}
+
+export function startASR() {
+  isASREnabled = true;
+  console.log("🎙️ ASR enabled.");
+}
+
 /**
  * Transcribes audio using Deepgram API
  * @param {File} audioFile - An audio File object from <input type="file">
@@ -12,7 +35,7 @@ export async function transcribeAudio(audioFile) {
   const arrayBuffer = await audioFile.arrayBuffer();
 
   const response = await fetch(
-    "https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true",
+    "https://api.deepgram.com/v1/listen?nova-3-general&detect_language=true&smart_format=true",
     {
       method: "POST",
       headers: {
@@ -150,7 +173,7 @@ export async function transcribeFromMicContinuous(onTranscript) {
         console.log("🗣️", transcript);
 
         if (transcript.trim() && transcript.split(" ").length > 3) {
-          console.log("transcript word length: ", transcript.split(" ").length)
+          console.log("transcript word length: ", transcript.split(" ").length);
           onTranscript(transcript);
         }
 
@@ -168,6 +191,7 @@ export async function transcribeFromMicContinuous(onTranscript) {
   restartMediaRecorder();
 
   processor.onaudioprocess = e => {
+    if (!isASREnabled) return;
     const inputData = e.inputBuffer.getChannelData(0);
     const rms = Math.sqrt(inputData.reduce((sum, s) => sum + s * s, 0) / inputData.length);
 
@@ -256,6 +280,7 @@ export async function transcribeOnceFromMic() {
     };
 
     processor.onaudioprocess = e => {
+      if (!isASREnabled) return;
       const inputData = e.inputBuffer.getChannelData(0);
       const rms = Math.sqrt(inputData.reduce((sum, s) => sum + s * s, 0) / inputData.length);
 
