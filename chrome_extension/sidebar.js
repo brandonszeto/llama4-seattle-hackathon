@@ -10,6 +10,25 @@ Analyze the Screenshot: Carefully examine the provided screenshot to understand 
 Provide Clear and Concise Instructions: Your instructions should be unambiguous and easy to follow. Refer to on-screen elements by their exact text or a clear description.
 Your tone should be helpful, patient, and encouraging. You are an expert guide, here to make any software task easy for the user.`;
 
+// popup.js
+import { transcribeAudio } from "./audio_processing/asr.js";
+
+document.getElementById("transcribeBtn").addEventListener("click", async () => {
+  const fileInput = document.getElementById("audioFile");
+  const file = fileInput.files[0];
+  const output = document.getElementById("output");
+
+  output.textContent = "⏳ Uploading and transcribing...";
+
+  try {
+    const transcript = await transcribeAudio(file);
+    output.textContent = transcript || "🤔 No transcript returned.";
+  } catch (err) {
+    output.textContent = `❌ Error: ${err.message}`;
+  }
+});
+
+
 async function callLlamaAPI(text, base64Image) {
   const apiKey = "LLM|1878124186367381|PZsjlEaCaJBnU-mW9Uwt4J8jIdg";
 
