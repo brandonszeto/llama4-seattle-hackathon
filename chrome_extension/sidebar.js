@@ -457,27 +457,32 @@ function createActionButton(text, action) {
   return button;
 }
 
+let highlightsActive = false;
+
 async function toggleHighlights() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     await ensureContentScriptLoaded(tab.id);
-    const response = await chrome.tabs.sendMessage(tab.id, {
-      action: 'highlightElements'
-    });
-    displayMessage('Interactive elements highlighted', 'system');
-  } catch (error) {
-    displayMessage(`Error: ${error.message}`, 'error');
-  }
-}
-
-async function removeHighlights() {
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    await ensureContentScriptLoaded(tab.id);
-    const response = await chrome.tabs.sendMessage(tab.id, {
-      action: 'removeHighlights'
-    });
-    displayMessage('Highlights removed', 'system');
+    
+    if (highlightsActive) {
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'removeHighlights'
+      });
+      displayMessage('Highlights removed', 'system');
+      highlightsActive = false;
+    } else {
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'highlightElements'
+      });
+      displayMessage('Interactive elements highlighted', 'system');
+      highlightsActive = true;
+    }
+    
+    // Update button text
+    const toggleBtn = document.getElementById('toggle-highlights-btn');
+    if (toggleBtn) {
+      toggleBtn.textContent = highlightsActive ? 'Hide' : 'Reveal';
+    }
   } catch (error) {
     displayMessage(`Error: ${error.message}`, 'error');
   }
@@ -486,11 +491,6 @@ async function removeHighlights() {
 document.addEventListener("DOMContentLoaded", () => {
   loadConversation();
 
-  // Add helper buttons
-  const buttonContainer = document.querySelector('.button-container');
-  const highlightBtn = createActionButton('Highlight Elements', toggleHighlights);
-  const removeHighlightBtn = createActionButton('Remove Highlights', removeHighlights);
-
-  buttonContainer.appendChild(highlightBtn);
-  buttonContainer.appendChild(removeHighlightBtn);
+  // Add event listener for toggle highlights button
+  document.getElementById('toggle-highlights-btn').addEventListener('click', toggleHighlights);
 });
