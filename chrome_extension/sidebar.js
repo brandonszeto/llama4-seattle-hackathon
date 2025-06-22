@@ -28,6 +28,18 @@ document.getElementById("transcribeBtn").addEventListener("click", async () => {
   }
 });
 
+import { transcribeFromMic } from './audio_processing/asr.js';
+
+document.getElementById("start-mic").addEventListener("click", async () => {
+  try {
+    const transcript = await transcribeFromMic(5000); // record for 5 seconds
+    console.log("🎙️ Transcript:", transcript);
+  } catch (err) {
+    console.error("Transcription failed:", err);
+  }
+});
+
+
 
 async function callLlamaAPI(text, base64Image) {
   const apiKey = "LLM|1878124186367381|PZsjlEaCaJBnU-mW9Uwt4J8jIdg";
@@ -123,7 +135,7 @@ async function handleSendClick() {
     const assistantResponse = await callLlamaAPI(userText, base64Image);
 
     displayMessage(assistantResponse, "assistant");
-    speak(assistantResponse)
+    speak(assistantResponse);
 
     conversationHistory.push({ role: "user", content: userText });
     conversationHistory.push({ role: "assistant", content: assistantResponse });
