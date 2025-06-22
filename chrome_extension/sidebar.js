@@ -4,13 +4,33 @@ const sendButton = document.getElementById("send-button");
 const resetButton = document.getElementById("reset-button");
 
 let conversationHistory = [];
-const SYSTEM_PROMPT = `You are an expert AI assistant designed to guide users through graphical user interfaces (GUIs).
-Your primary function is to analyze screenshots of a user's screen and provide clear, step-by-step instructions to help them accomplish their stated goal.
-Analyze the Screenshot: Carefully examine the provided screenshot to understand the current state of the application.
-Provide Clear and Concise Instructions: Your instructions should be unambiguous and easy to follow. Refer to on-screen elements by their exact text or a clear description.
-Your tone should be helpful, patient, and encouraging. You are an expert guide, here to make any software task easy for the user.`;
+const SYSTEM_PROMPT = `You are an expert AI assistant designed to guide users through graphical user interfaces (GUIs) and can also perform actions on their behalf with confirmation.
 
-async function callLlamaAPI(text, base64Image) {
+Your capabilities include:
+1. Analyzing screenshots and providing step-by-step instructions
+2. Clicking buttons, links, and other clickable elements 
+3. Filling text inputs, textareas, and form fields
+4. Always requiring user confirmation before performing any action
+
+When providing guidance:
+- Analyze the screenshot carefully to understand the current state
+- Provide clear, concise instructions referring to elements by their exact text
+- Be helpful, patient, and encouraging
+
+When taking actions:
+- You can suggest performing actions like "I can click the 'Submit' button for you" 
+- Always ask for confirmation before acting: "Would you like me to click/fill this for you?"
+- Use specific selectors when possible (CSS selectors, button text, input labels)
+- Describe what you're about to do clearly
+
+Available action commands you can use:
+- To click an element: Say "CLICK_ELEMENT: [CSS selector], [description]"
+- To fill text: Say "FILL_TEXTBOX: [CSS selector], [text to fill], [description]"
+- To highlight all interactive elements: Say "HIGHLIGHT_ELEMENTS"
+
+Your tone should be helpful, patient, and encouraging. Always prioritize user safety by confirming actions.`;
+
+async function callLlamaAPI(text, base64Image, availableElements = []) {
   const apiKey = "LLM|1878124186367381|PZsjlEaCaJBnU-mW9Uwt4J8jIdg";
 
   if (apiKey === "YOUR_LLAMA_API_KEY") {
@@ -25,10 +45,24 @@ async function callLlamaAPI(text, base64Image) {
     ...conversationHistory,
   ];
 
+  // Format elements list for Llama
+  let elementsText = "";
+  if (availableElements && availableElements.length > 0) {
+    elementsText = "\n\nAVAILABLE INTERACTIVE ELEMENTS:\n";
+    availableElements.forEach((el, index) => {
+      if (el.type === 'clickable') {
+        elementsText += `${index + 1}. CLICKABLE: "${el.text}" (selector: ${el.selector})\n`;
+      } else if (el.type === 'input') {
+        elementsText += `${index + 1}. INPUT: "${el.text}" - ${el.inputType} (selector: ${el.selector})\n`;
+      }
+    });
+    elementsText += "\nWhen performing actions, use the EXACT selector provided above.\n";
+  }
+
   messagesForApi.push({
     role: "user",
     content: [
-      { type: "text", text: text },
+      { type: "text", text: text + elementsText },
       {
         type: "image_url",
         image_url: { url: `data:image/png;base64,${base64Image}` },
@@ -67,12 +101,62 @@ async function callLlamaAPI(text, base64Image) {
   }
 }
 
-function displayMessage(text, role) {
+function displayMessage(text, role, interactive = false) {
   const messageDiv = document.createElement("div");
   messageDiv.classList.add("message", `${role}-message`);
-  messageDiv.textContent = text;
+  
+  if (interactive) {
+    messageDiv.innerHTML = text; // Allow HTML for interactive content
+  } else {
+    messageDiv.textContent = text;
+  }
+  
   conversationView.appendChild(messageDiv);
   conversationView.scrollTop = conversationView.scrollHeight;
+  return messageDiv;
+}
+
+function displayConfirmationMessage(message, onConfirm, onCancel) {
+  const confirmText = `
+    <div style="margin-bottom: 12px;">${message}</div>
+    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="confirm-cancel-btn" style="
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        background: #f5f5f5;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      ">Cancel</button>
+      <button class="confirm-confirm-btn" style="
+        padding: 6px 12px;
+        border: 1px solid #007cba;
+        background: #007cba;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      ">Confirm</button>
+    </div>
+  `;
+  
+  const messageDiv = displayMessage(confirmText, 'system', true);
+  
+  // Add event listeners
+  const cancelBtn = messageDiv.querySelector('.confirm-cancel-btn');
+  const confirmBtn = messageDiv.querySelector('.confirm-confirm-btn');
+  
+  cancelBtn.addEventListener('click', () => {
+    messageDiv.remove();
+    onCancel();
+  });
+  
+  confirmBtn.addEventListener('click', () => {
+    messageDiv.remove();
+    onConfirm();
+  });
+  
+  return messageDiv;
 }
 
 function renderConversation() {
@@ -101,9 +185,18 @@ async function handleSendClick() {
     });
     const base64Image = dataUrl.split(",")[1];
 
-    const assistantResponse = await callLlamaAPI(userText, base64Image);
+    // Get available interactive elements
+    await ensureContentScriptLoaded(tab.id);
+    const elementsResponse = await chrome.tabs.sendMessage(tab.id, {
+      action: 'getInteractableElements'
+    });
+    
+    const assistantResponse = await callLlamaAPI(userText, base64Image, elementsResponse.elements);
 
     displayMessage(assistantResponse, "assistant");
+    
+    // Process any action commands in the response
+    await processActionCommands(assistantResponse);
 
     conversationHistory.push({ role: "user", content: userText });
     conversationHistory.push({ role: "assistant", content: assistantResponse });
@@ -145,4 +238,196 @@ userPromptInput.addEventListener("keydown", (event) => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", loadConversation);
+// --- Action Processing Functions ---
+async function processActionCommands(responseText) {
+  const commands = [
+    { pattern: /CLICK_ELEMENT:\s*([^,]+),\s*(.+)/g, type: 'click' },
+    { pattern: /FILL_TEXTBOX:\s*([^,]+),\s*([^,]+),\s*(.+)/g, type: 'fill' },
+    { pattern: /HIGHLIGHT_ELEMENTS/g, type: 'highlight' }
+  ];
+
+  for (const command of commands) {
+    let match;
+    while ((match = command.pattern.exec(responseText)) !== null) {
+      await executeCommand(command.type, match);
+    }
+  }
+}
+
+async function executeCommand(type, match) {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    // Ensure content script is injected
+    await ensureContentScriptLoaded(tab.id);
+    
+    if (type === 'click') {
+      const selector = match[1].trim();
+      const description = match[2].trim();
+      
+      // First call to get confirmation info
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'clickElement',
+        selector: selector,
+        description: description,
+        confirmed: false
+      });
+      
+      if (response.needsConfirmation) {
+        // Show confirmation in chat
+        displayConfirmationMessage(
+          `Do you want to click on: "${response.elementText}"?`,
+          async () => {
+            // User confirmed - execute the click
+            try {
+              const confirmResponse = await chrome.tabs.sendMessage(tab.id, {
+                action: 'clickElement',
+                selector: selector,
+                description: description,
+                confirmed: true
+              });
+              displayMessage(`✅ ${confirmResponse.message || confirmResponse.error}`, 'system');
+            } catch (error) {
+              displayMessage(`❌ Error: ${error.message}`, 'error');
+            }
+          },
+          () => {
+            // User cancelled
+            displayMessage('❌ Action cancelled', 'system');
+            // Remove highlight
+            chrome.tabs.sendMessage(tab.id, { action: 'removeHighlights' });
+          }
+        );
+      } else {
+        displayMessage(`❌ ${response.error}`, 'error');
+      }
+      
+    } else if (type === 'fill') {
+      const selector = match[1].trim();
+      const text = match[2].trim();
+      const description = match[3].trim();
+      
+      // First call to get confirmation info
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'fillTextbox',
+        selector: selector,
+        text: text,
+        description: description,
+        confirmed: false
+      });
+      
+      if (response.needsConfirmation) {
+        // Show confirmation in chat
+        displayConfirmationMessage(
+          `Do you want to fill "${response.elementText}" with: "${text}"?`,
+          async () => {
+            // User confirmed - execute the fill
+            try {
+              const confirmResponse = await chrome.tabs.sendMessage(tab.id, {
+                action: 'fillTextbox',
+                selector: selector,
+                text: text,
+                description: description,
+                confirmed: true
+              });
+              displayMessage(`✅ ${confirmResponse.message || confirmResponse.error}`, 'system');
+            } catch (error) {
+              displayMessage(`❌ Error: ${error.message}`, 'error');
+            }
+          },
+          () => {
+            // User cancelled
+            displayMessage('❌ Action cancelled', 'system');
+            // Remove highlight
+            chrome.tabs.sendMessage(tab.id, { action: 'removeHighlights' });
+          }
+        );
+      } else {
+        displayMessage(`❌ ${response.error}`, 'error');
+      }
+      
+    } else if (type === 'highlight') {
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        action: 'highlightElements'
+      });
+      
+      displayMessage('🔍 Interactive elements highlighted on the page', 'system');
+    }
+  } catch (error) {
+    displayMessage(`❌ Error executing command: ${error.message}`, 'error');
+  }
+}
+
+// Ensure content script is loaded
+async function ensureContentScriptLoaded(tabId) {
+  try {
+    // Try to ping the content script
+    await chrome.tabs.sendMessage(tabId, { action: 'ping' });
+  } catch (error) {
+    // Content script not loaded, inject it
+    console.log('Content script not found, injecting...');
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ['content.js']
+    });
+    
+    // Wait a bit for the script to load
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+}
+
+// --- Additional UI Functions ---
+function createActionButton(text, action) {
+  const button = document.createElement('button');
+  button.textContent = text;
+  button.style.cssText = `
+    margin: 5px;
+    padding: 8px 12px;
+    background: #007cba;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  button.addEventListener('click', action);
+  return button;
+}
+
+async function toggleHighlights() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await ensureContentScriptLoaded(tab.id);
+    const response = await chrome.tabs.sendMessage(tab.id, {
+      action: 'highlightElements'
+    });
+    displayMessage('Interactive elements highlighted', 'system');
+  } catch (error) {
+    displayMessage(`Error: ${error.message}`, 'error');
+  }
+}
+
+async function removeHighlights() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await ensureContentScriptLoaded(tab.id);
+    const response = await chrome.tabs.sendMessage(tab.id, {
+      action: 'removeHighlights'
+    });
+    displayMessage('Highlights removed', 'system');
+  } catch (error) {
+    displayMessage(`Error: ${error.message}`, 'error');
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadConversation();
+  
+  // Add helper buttons
+  const buttonContainer = document.querySelector('.button-container');
+  const highlightBtn = createActionButton('Highlight Elements', toggleHighlights);
+  const removeHighlightBtn = createActionButton('Remove Highlights', removeHighlights);
+  
+  buttonContainer.appendChild(highlightBtn);
+  buttonContainer.appendChild(removeHighlightBtn);
+});

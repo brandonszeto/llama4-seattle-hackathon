@@ -54,6 +54,16 @@ body {
     text-align: center;
 }
 
+.system-message {
+    background-color: #34c759;
+    color: white;
+    align-self: center;
+    text-align: center;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 12px;
+}
+
 #input-area {
     padding: 10px;
     border-top: 1px solid #dcdcdc;

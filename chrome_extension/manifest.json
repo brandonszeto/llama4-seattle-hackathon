@@ -6,7 +6,15 @@
     "activeTab",
     "storage",
     "sidePanel",
-    "tabs"
+    "tabs",
+    "scripting"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
   ],  "host_permissions": [
     "https://api.llama.com/*",
     "<all_urls>"
