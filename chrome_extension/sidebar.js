@@ -41,7 +41,7 @@ Available action commands you can use:
 Your tone should be helpful, patient, and encouraging. Always prioritize user safety by confirming actions.`;
 
 let isListening = false;
-let currentMode = 'speech'; // 'speech' or 'chat'
+let currentMode = 'chat'; // 'speech' or 'chat'
 const toggleAudioBtn = document.getElementById("toggle-audio-button");
 const modeToggleBtn = document.getElementById("mode-toggle-btn");
 
