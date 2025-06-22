@@ -1,5 +1,5 @@
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("Llama Sidebar Helper installed");
+  console.log("Meta Assistant installed");
   chrome.sidePanel.setOptions({ enabled: true, path: "sidebar.html" });
 });
 

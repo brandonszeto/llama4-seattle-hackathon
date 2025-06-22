@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Llama Sidebar Helper",
+  "name": "Meta Assistant",
   "version": "1.1.0",
   "description": "Analyzes a screenshot of the current tab in a sidebar using the Llama API.",  "permissions": [
     "activeTab",
@@ -20,7 +20,7 @@
       "48": "images/icon48.png",
       "128": "images/icon128.png"
     },
-    "default_title": "Open Llama Sidebar Helper"
+    "default_title": "Open Meta Assistant"
   },
   "side_panel": {
     "default_path": "sidebar.html"

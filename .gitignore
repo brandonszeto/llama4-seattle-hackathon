@@ -75,3 +75,5 @@ chrome_extension/node_modules/
 frontend/node_modules/
 frontend/build/
 frontend/dist/
+
+*.DS_Store
