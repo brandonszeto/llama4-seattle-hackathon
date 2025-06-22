@@ -2,14 +2,14 @@
   "manifest_version": 3,
   "name": "Llama Sidebar Helper",
   "version": "1.1.0",
-  "description": "Analyzes a screenshot of the current tab in a sidebar using the Llama API.",
-  "permissions": [
+  "description": "Analyzes a screenshot of the current tab in a sidebar using the Llama API.",  "permissions": [
     "activeTab",
     "storage",
-    "sidePanel"
-  ],
-  "host_permissions": [
-    "https://api.llama.com/*"
+    "sidePanel",
+    "tabs"
+  ],  "host_permissions": [
+    "https://api.llama.com/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
