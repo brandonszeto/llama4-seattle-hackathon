@@ -1,6 +1,14 @@
 import { OPENAI_KEY } from "../env.js";
-
 let currentAudio = null;
+
+export function stopSpeaking() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = "";
+    currentAudio = null;
+    console.log("🔇 TTS playback stopped");
+  }
+}
 
 /**
  * Generate speech from text using OpenAI's TTS API and play it back.
@@ -53,19 +61,9 @@ export async function speak(text, voice = "echo") {
 }
 
 /**
- * Stop any currently playing speech
- */
-export function stopSpeaking() {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
-  }
-}
-
-/**
  * Check if speech is currently playing
  */
 export function isSpeaking() {
   return currentAudio && !currentAudio.paused;
 }
+

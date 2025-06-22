@@ -1,5 +1,14 @@
-import { speak, stopSpeaking, isSpeaking } from "./audio_processing/tts.js";
-import { transcribeFromMicContinuous, transcribeOnceFromMic, stopAllASR, startASR, getIsFirstSpeech, initSpeech } from './audio_processing/asr.js';
+import { speak, stopSpeaking } from "./audio_processing/tts.js";
+import {
+  transcribeFromMicContinuous,
+  transcribeOnceFromMic,
+  stopAllASR,
+  startASR,
+  getIsFirstSpeech,
+  initSpeech,
+  startSpeechDetection,
+  stopSpeechDetection
+} from './audio_processing/asr.js';
 const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
 const sendButton = document.getElementById("send-button");
@@ -52,7 +61,7 @@ toggleAudioBtn.addEventListener("click", async () => {
 
   // Stop any ongoing speech when starting to listen
   stopSpeaking();
-  
+
   startASR();
   toggleAudioBtn.textContent = "Stop Mic";
   isListening = true;
@@ -72,17 +81,6 @@ toggleAudioBtn.addEventListener("click", async () => {
     console.error("Transcription failed:", err);
   }
 });
-// document.getElementById("toggle-audio-button").addEventListener("click", async () => {
-//   try {
-//     await speak("Hi there, I'm Llama your helpful, (anything!) assistant. You're in accessibility mode, so let me know if there's anything I can help you with!")
-//     await transcribeFromMicContinuous((transcript) => {
-//       userPromptInput.value = transcript;
-//       handleSendClick();
-//     });
-//   } catch (err) {
-//     console.error("Transcription failed:", err);
-//   }
-// });
 
 async function callLlamaAPI(text, base64Image, availableElements = []) {
   const apiKey = "LLM|1878124186367381|PZsjlEaCaJBnU-mW9Uwt4J8jIdg";
@@ -306,14 +304,23 @@ async function handleSendClick() {
       .replace(/\n\nAVAILABLE INTERACTIVE ELEMENTS:[\s\S]*?When performing actions[^\n]*\n/g, '') // Remove elements list
       .replace(/^\s+|\s+$/g, '') // Trim whitespace
       .trim();
-displayMessage(messageDisplay, "assistant");
+    displayMessage(messageDisplay, "assistant");
 
-// Only speak in speech mode
-if (currentMode === 'speech') {
-  await speak(messageDisplay);
-}
-    // displayMessage(assistantResponse, "assistant");
-    // await speak(assistantResponse);
+    // 🧠 Start listening for user's voice to interrupt TTS
+    startSpeechDetection(() => {
+      console.log("🛑 User started speaking, interrupting TTS");
+      stopSpeaking();           // Stop TTS playback
+      stopSpeechDetection();    // Clean up listener
+    });
+
+    // Only speak in speech mode
+    if (currentMode === 'speech') {
+      const audio = await speak(messageDisplay);
+      audio.onended = () => {
+        console.log("✅ TTS finished naturally");
+        stopSpeechDetection();    // Clean up if playback ends
+      };
+    }
 
     // Process any action commands in the response
     await processActionCommands(assistantResponse);
@@ -520,7 +527,7 @@ async function toggleHighlights() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     await ensureContentScriptLoaded(tab.id);
-    
+
     if (highlightsActive) {
       const response = await chrome.tabs.sendMessage(tab.id, {
         action: 'removeHighlights'
@@ -534,7 +541,7 @@ async function toggleHighlights() {
       displayMessage('Interactive elements highlighted', 'system');
       highlightsActive = true;
     }
-    
+
     // Update button text
     const toggleBtn = document.getElementById('toggle-highlights-btn');
     if (toggleBtn) {
@@ -552,7 +559,7 @@ function toggleMode() {
 
 function updateModeUI() {
   const audioControls = document.querySelector('.audio-controls');
-  
+
   if (currentMode === 'speech') {
     modeToggleBtn.textContent = 'Speech Mode';
     modeToggleBtn.className = 'speech-mode';
@@ -563,7 +570,7 @@ function updateModeUI() {
     modeToggleBtn.className = 'chat-mode';
     audioControls.style.display = 'none';
     userPromptInput.placeholder = 'Type your message...';
-    
+
     // Stop any ongoing speech/listening when switching to chat mode
     if (isListening) {
       stopAllASR();
@@ -580,10 +587,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add event listener for mode toggle button
   modeToggleBtn.addEventListener('click', toggleMode);
-  
+
   // Add event listener for toggle highlights button
   document.getElementById('toggle-highlights-btn').addEventListener('click', toggleHighlights);
-  
+
   // Add event listener for stop speaking button
   document.getElementById('stop-speaking-button').addEventListener('click', () => {
     stopSpeaking();

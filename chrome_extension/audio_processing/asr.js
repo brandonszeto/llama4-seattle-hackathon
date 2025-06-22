@@ -304,3 +304,39 @@ export async function transcribeOnceFromMic() {
     processor.connect(audioContext.destination);
   });
 }
+
+let voiceActivityDetector = null;
+
+export function startSpeechDetection(onSpeechStart) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    const audioContext = new AudioContext();
+    const input = audioContext.createMediaStreamSource(stream);
+    const processor = audioContext.createScriptProcessor(1024, 1, 1);
+
+    processor.onaudioprocess = e => {
+      const inputData = e.inputBuffer.getChannelData(0);
+      const rms = Math.sqrt(inputData.reduce((sum, s) => sum + s * s, 0) / inputData.length);
+      if (rms > 0.03) {
+        onSpeechStart?.(); // 🗣️ Call interrupt handler
+      }
+    };
+
+    input.connect(processor);
+    processor.connect(audioContext.destination);
+    voiceActivityDetector = { stream, audioContext, processor, input };
+  });
+}
+
+export function stopSpeechDetection() {
+  if (voiceActivityDetector) {
+    const { stream, processor, input, audioContext } = voiceActivityDetector;
+    processor.disconnect();
+    input.disconnect();
+    stream.getTracks().forEach(t => t.stop());
+    audioContext.close();
+    voiceActivityDetector = null;
+    console.log("🛑 Voice activity detector stopped");
+  }
+}
