@@ -1,9 +1,8 @@
 <!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
+<html lang="en">    <head>        <meta charset="UTF-8" />
         <title>Meta Sidebar Helper</title>
         <link rel="stylesheet" href="sidebar.css" />
+        <script src="pdf.js"></script>
     </head>
     <body>
         <div id="main-container">
@@ -12,10 +11,15 @@
                 <textarea
                     id="user-prompt"
                     placeholder="Ask about the screen..."
-                ></textarea>
-                <div class="button-container">
+                ></textarea>                <div class="button-container">
                     <button id="send-button">Capture & Ask Meta</button>
                     <button id="reset-button">Reset</button>
+                </div>                <div id="context-upload">
+                    <input type="file" id="file-upload" accept=".pdf,.doc,.docx" style="display: none;" />
+                    <button id="add-context-button">Add Context</button>
+                    <span id="file-name"></span>
+                    <button id="show-extracted-text" style="display: none;">Show Extracted Text</button>
+                    <div id="extracted-text-preview" style="display: none; max-height: 200px; overflow-y: auto; border: 1px solid #ccc; margin-top: 10px; padding: 8px; font-size: 12px;"></div>
                 </div>
             </div>
         </div>

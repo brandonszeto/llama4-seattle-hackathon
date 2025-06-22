@@ -12,9 +12,13 @@
                 <textarea
                     id="user-prompt"
                     placeholder="Ask about the screen..."
-                ></textarea>
-                <button id="send-button">Capture & Ask Meta</button>
+                ></textarea>                <button id="send-button">Capture & Ask Meta</button>
                 <button id="reset-button">Reset</button>
+                <div id="context-upload">
+                    <input type="file" id="file-upload" accept=".pdf,.doc,.docx" style="display: none;" />
+                    <button id="add-context-button">Add Context</button>
+                    <span id="file-name"></span>
+                </div>
             </div>
         </div>
         <script src="popup.js"></script>

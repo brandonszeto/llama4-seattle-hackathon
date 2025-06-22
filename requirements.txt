@@ -1,3 +1,13 @@
 requests
 llama-api-client
 pillow
+PyPDF2>=3.0.0
+pdfminer.six
+python-docx
+langchain
+python-magic-bin
+beautifulsoup4
+pytesseract
+pdf2image
+Flask
+Flask-CORS

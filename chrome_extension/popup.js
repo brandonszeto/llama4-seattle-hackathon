@@ -3,9 +3,13 @@ const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
 const sendButton = document.getElementById("send-button");
 const resetButton = document.getElementById("reset-button");
+const addContextButton = document.getElementById("add-context-button");
+const fileUploadInput = document.getElementById("file-upload");
+const fileNameDisplay = document.getElementById("file-name");
 
 // --- State Management ---
 let conversationHistory = [];
+let uploadedFile = null;
 const SYSTEM_PROMPT = `You are an expert AI assistant designed to guide users through graphical user interfaces (GUIs).
 Your primary function is to analyze screenshots of a user's screen and provide clear, step-by-step instructions to help them accomplish their stated goal.
 Analyze the Screenshot: Carefully examine the provided screenshot to understand the current state of the application.
@@ -25,11 +29,29 @@ async function callLlamaAPI(text, base64Image) {
   }
 
   const apiUrl = "https://api.llama.com/v1/chat/completions";
-
   let messagesForApi = [
     { role: "system", content: SYSTEM_PROMPT },
     ...conversationHistory,
   ];
+
+  // Add file context if available
+  if (uploadedFile) {
+    try {
+      const fileContent = await readFileContent(uploadedFile);
+      
+      // Add a message to inform the user that file context is being used
+      displayMessage(`Using context from file: ${uploadedFile.name}`, "system");
+      
+      // Add file context to API payload
+      messagesForApi.push({
+        role: "user",
+        content: `Context from uploaded file "${uploadedFile.name}":\n${fileContent}`
+      });
+    } catch (error) {
+      console.error("Error reading file content:", error);
+      displayMessage("Error processing file. Please try again.", "error");
+    }
+  }
 
   messagesForApi.push({
     role: "user",
