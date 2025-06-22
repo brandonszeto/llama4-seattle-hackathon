@@ -33,6 +33,7 @@ Your tone should be helpful, patient, and encouraging. Always prioritize user sa
 
 document.getElementById("toggle-audio-button").addEventListener("click", async () => {
   try {
+    await speak("Hi there, I'm Llama your helpful, (anything!) assistant. You're in accessibility mode, so let me know if there's anything I can help you with!")
     await transcribeFromMicContinuous((transcript) => {
       userPromptInput.value = transcript;
       handleSendClick();
