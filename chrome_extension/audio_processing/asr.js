@@ -1,7 +1,4 @@
-// asr.js
-
-const DEEPGRAM_API_KEY = "e038ecc755b662c1a80cdd5f18cbaf1f99063829"; // 🔐 Replace with actual key
-
+import { DEEPGRAM_API_KEY } from "../env.js";
 /**
  * Transcribes audio using Deepgram API
  * @param {File} audioFile - An audio File object from <input type="file">
@@ -106,4 +103,94 @@ export async function transcribeFromMic(recordTimeMs = 5000) {
       mediaRecorder.stop();
     }, recordTimeMs);
   });
+}
+
+/**
+ * Continuously captures mic input and transcribes after silence is detected using Deepgram.
+ * Calls `onTranscript(text)` for each utterance.
+ */
+export async function transcribeFromMicContinuous(onTranscript) {
+  const SILENCE_THRESHOLD = 0.03;
+  const SILENCE_MS = 1800;
+  const CHUNK_MS = 1024 / 16000 * 1000; // ~64ms at 16kHz
+
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const audioContext = new AudioContext();
+  const input = audioContext.createMediaStreamSource(stream);
+  const processor = audioContext.createScriptProcessor(1024, 1, 1);
+
+  let mediaRecorder = null;
+  let currentChunks = [];
+  let recording = false;
+  let silenceMs = 0;
+  let shouldStop = false;
+
+  const restartMediaRecorder = () => {
+    currentChunks = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+
+    mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) currentChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(currentChunks, { type: "audio/webm" });
+      const arrayBuffer = await blob.arrayBuffer();
+
+      try {
+        const res = await fetch(
+          "https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Token ${DEEPGRAM_API_KEY}`,
+              "Content-Type": "audio/webm",
+            },
+            body: arrayBuffer,
+          }
+        );
+
+        const json = await res.json();
+        const transcript = json.results.channels[0].alternatives[0].transcript;
+        console.log("🗣️", transcript);
+
+        if (transcript.trim()) {
+          onTranscript(transcript);
+        }
+
+        // Restart the recording loop
+
+        recording = false;
+        silenceMs = 0;
+        restartMediaRecorder();
+      } catch (err) {
+        console.error("Transcription error:", err);
+      }
+    };
+  };
+
+  restartMediaRecorder();
+
+  processor.onaudioprocess = e => {
+    const inputData = e.inputBuffer.getChannelData(0);
+    const rms = Math.sqrt(inputData.reduce((sum, s) => sum + s * s, 0) / inputData.length);
+
+    if (rms > SILENCE_THRESHOLD) {
+      if (!recording) {
+        console.log("🎤 Recording started...");
+        mediaRecorder.start();
+        recording = true;
+      }
+      silenceMs = 0;
+    } else if (recording) {
+      silenceMs += CHUNK_MS;
+      if (silenceMs > SILENCE_MS) {
+        console.log("🛑 Silence detected, stopping...");
+        mediaRecorder.stop();
+      }
+    }
+  };
+
+  input.connect(processor);
+  processor.connect(audioContext.destination);
 }

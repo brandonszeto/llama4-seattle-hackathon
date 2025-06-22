@@ -91,3 +91,47 @@ body {
     background-color: #a0a0a0;
     cursor: not-allowed;
 }
+
+#toggle-audio-button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #007aff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#toggle-audio-button:hover {
+    background-color: #0056b3;
+}
+
+#toggle-audio-button:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+}
+
+#toggle-audio-button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #007aff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#toggle-audio-button:hover {
+    background-color: #0056b3;
+}
+
+#toggle-audio-button:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+}

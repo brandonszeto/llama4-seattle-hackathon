@@ -6,10 +6,12 @@
   "permissions": [
     "activeTab",
     "storage",
-    "sidePanel"
+    "sidePanel",
+    "tabs"
   ],
   "host_permissions": [
-    "https://api.llama.com/*"
+    "https://api.llama.com/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
@@ -32,7 +34,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["sidebar.html", "sidebar.js", "sidebar.css"],
+      "resources": ["sidebar.html", "sidebar.js", "sidebar.css", "env.js"],
       "matches": ["<all_urls>"]
     }
   ],

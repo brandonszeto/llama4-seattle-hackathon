@@ -1,8 +1,4 @@
-// tts.js
-
-const OPENAI_API_KEY = "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"; // Replace with your actual key or import securely
-
-/**
+import { OPENAI_KEY } from "../env.js";/**
  * Generate speech from text using OpenAI's TTS API and play it back.
  * @param {string} text - The input text to be converted to speech.
  * @param {string} voice - One of: "nova", "shimmer", "echo", "onyx", "fable"
@@ -15,7 +11,7 @@ export async function speak(text, voice = "echo") {
   const response = await fetch("https://api.openai.com/v1/audio/speech", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${OPENAI_API_KEY}`,
+      "Authorization": `Bearer ${OPENAI_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({

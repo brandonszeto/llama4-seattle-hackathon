@@ -1,4 +1,5 @@
 import { speak } from "./audio_processing/tts.js";
+import { transcribeFromMicContinuous } from './audio_processing/asr.js';
 const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
 const sendButton = document.getElementById("send-button");
@@ -10,36 +11,16 @@ Analyze the Screenshot: Carefully examine the provided screenshot to understand 
 Provide Clear and Concise Instructions: Your instructions should be unambiguous and easy to follow. Refer to on-screen elements by their exact text or a clear description.
 Your tone should be helpful, patient, and encouraging. You are an expert guide, here to make any software task easy for the user.`;
 
-// popup.js
-import { transcribeAudio } from "./audio_processing/asr.js";
-
-document.getElementById("transcribeBtn").addEventListener("click", async () => {
-  const fileInput = document.getElementById("audioFile");
-  const file = fileInput.files[0];
-  const output = document.getElementById("output");
-
-  output.textContent = "⏳ Uploading and transcribing...";
-
+document.getElementById("toggle-audio-button").addEventListener("click", async () => {
   try {
-    const transcript = await transcribeAudio(file);
-    output.textContent = transcript || "🤔 No transcript returned.";
-  } catch (err) {
-    output.textContent = `❌ Error: ${err.message}`;
-  }
-});
-
-import { transcribeFromMic } from './audio_processing/asr.js';
-
-document.getElementById("start-mic").addEventListener("click", async () => {
-  try {
-    const transcript = await transcribeFromMic(5000); // record for 5 seconds
-    console.log("🎙️ Transcript:", transcript);
+    await transcribeFromMicContinuous((transcript) => {
+      userPromptInput.value = transcript;
+      handleSendClick();
+    });
   } catch (err) {
     console.error("Transcription failed:", err);
   }
 });
-
-
 
 async function callLlamaAPI(text, base64Image) {
   const apiKey = "LLM|1878124186367381|PZsjlEaCaJBnU-mW9Uwt4J8jIdg";
@@ -135,7 +116,7 @@ async function handleSendClick() {
     const assistantResponse = await callLlamaAPI(userText, base64Image);
 
     displayMessage(assistantResponse, "assistant");
-    speak(assistantResponse);
+    await speak(assistantResponse);
 
     conversationHistory.push({ role: "user", content: userText });
     conversationHistory.push({ role: "assistant", content: assistantResponse });
