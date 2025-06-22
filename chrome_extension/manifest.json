@@ -1,12 +1,42 @@
 {
   "manifest_version": 3,
-  "name": "Llama Screenshot Helper (Final)",
+  "name": "Llama Sidebar Helper",
   "version": "1.1.0",
-  "description": "Analyzes a screenshot of the current tab with a text prompt using the Llama API.",
-  "permissions": ["activeTab", "storage"],
-  "host_permissions": ["https://api.llama.com/"],
+  "description": "Analyzes a screenshot of the current tab in a sidebar using the Llama API.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://api.llama.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
-    "default_popup": "popup.html",
-    "default_title": "Ask Llama about this page"
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    },
+    "default_title": "Open Llama Sidebar Helper"
+  },
+  "side_panel": {
+    "default_path": "sidebar.html"
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html", "sidebar.js", "sidebar.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

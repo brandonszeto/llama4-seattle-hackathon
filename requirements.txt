@@ -1,0 +1,3 @@
+requests
+llama-api-client
+pillow
