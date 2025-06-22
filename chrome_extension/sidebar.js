@@ -1,3 +1,4 @@
+import { speak } from "./audio_processing/tts.js";
 const conversationView = document.getElementById("conversation-view");
 const userPromptInput = document.getElementById("user-prompt");
 const sendButton = document.getElementById("send-button");
@@ -103,6 +104,7 @@ async function handleSendClick() {
     const assistantResponse = await callLlamaAPI(userText, base64Image);
 
     displayMessage(assistantResponse, "assistant");
+    speak(assistantResponse)
 
     conversationHistory.push({ role: "user", content: userText });
     conversationHistory.push({ role: "assistant", content: assistantResponse });
