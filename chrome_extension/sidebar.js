@@ -254,9 +254,18 @@ async function handleSendClick() {
     });
 
     const assistantResponse = await callLlamaAPI(userText, base64Image, elementsResponse.elements);
+    // let messagedisplay  = assistantResponse
+  let messageDisplay = assistantResponse
+    .replace(/CLICK_ELEMENT:\s*[^,]+,\s*.+\n?/g, '')
+    .replace(/FILL_TEXTBOX:\s*[^,]+,\s*[^,]+,\s*.+\n?/g, '')
+    .replace(/HIGHLIGHT_ELEMENTS\n?/g, '')
+    .replace(/\s*\(\s*$/g, '') // Remove trailing parentheses with optional whitespace
+    .trim();
 
-    displayMessage(assistantResponse, "assistant");
-    await speak(assistantResponse);
+displayMessage(messageDisplay, "assistant");
+await speak(messageDisplay);
+    // displayMessage(assistantResponse, "assistant");
+    // await speak(assistantResponse);
 
     // Process any action commands in the response
     await processActionCommands(assistantResponse);
